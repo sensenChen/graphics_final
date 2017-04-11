@@ -1,1 +1,1 @@
-1
+water particle mass .002

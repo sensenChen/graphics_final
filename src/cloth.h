@@ -5,8 +5,7 @@
 #include "boundingbox.h"
 #include "vbo_structs.h"
 #include <vector>
-#include 
-
+#include "cell.h"
 // =====================================================================================
 // Cloth Particles
 // =====================================================================================
@@ -28,12 +27,15 @@ public:
   void setAcceleration(const glm::vec3 &a) { acceleration = a; }
   void setMass(double m) { mass = m; }
   void setFixed(bool b) { fixed = b; }
+  void setCell(Cell *c){cell = c;}
+  Cell* getCell(){return cell;}
 private:
   // REPRESENTATION
   glm::vec3 original_position;
   glm::vec3 position;
   glm::vec3 velocity;
   glm::vec3 acceleration;
+  Cell *cell;
   double mass;
   bool fixed;
 };
