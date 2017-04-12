@@ -7,6 +7,7 @@
 #include "argparser.h"
 #include "utils.h"
 #include <math.h>
+#include "glm/gtx/string_cast.hpp"
 
 // ================================================================================
 // ================================================================================
@@ -65,12 +66,13 @@ Cloth::Cloth(ArgParser *_args) {
       p.setVelocity(glm::vec3(0,0,0));
       p.setMass(mass);
       p.setFixed(false);
+      std::cout<<mass<<std::endl;
     }
   }
 
   // the fixed particles
   istr >> token;
-  while (token != density) {
+  while (token=="f") {
     assert (token == "f");
     int i,j;
     double x,y,z;
@@ -78,10 +80,27 @@ Cloth::Cloth(ArgParser *_args) {
     ClothParticle &p = getParticle(i,j);
     p.setPosition(glm::vec3(x,y,z));
     p.setFixed(true);
-    istr >>token;
+    istr>>token;
   }
   
-
+  //while(token=="particles_position")
+  //{
+    int p_x,p_y,p_num;
+    istr>>p_x>>p_y>>p_num;
+    //istr>>token;
+     
+        ClothParticle &c_w = getParticle(p_x,p_y);
+        Cell &cell = c_w.getCell();
+        for (int k = 0; k < p_num; ++k)
+        {
+          glm::vec3 pos = glm::vec3(p_x,p_y,0);
+          FluidParticle *f_p = new FluidParticle();
+          f_p->setPosition(pos);
+          cell.addParticle(f_p);
+        }
+        //std::cout<<cell.numParticles()<<std::endl;
+  //}   std::cout<<cell.numParticles()<<std::endl;
+        //std::cout<<(p.getCell()).numParticles()<<std::endl;
   computeBoundingBox();
 }
 

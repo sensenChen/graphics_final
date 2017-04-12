@@ -6,6 +6,7 @@
 #include "vbo_structs.h"
 #include <vector>
 #include "cell.h"
+
 // =====================================================================================
 // Cloth Particles
 // =====================================================================================
@@ -17,8 +18,9 @@ public:
   const glm::vec3& getPosition() const{ return position; }
   const glm::vec3& getVelocity() const{ return velocity; }
   const glm::vec3& getAcceleration() const { return acceleration; }
-  glm::vec3 getForce() const { return float(mass)*acceleration; }
-  double getMass() const { return mass; }
+  glm::vec3 getForce() const { return float(mass + cell.numParticles()*0.0002)*acceleration; }
+  double getMass() const { return mass+cell.numParticles()*0.0002; }
+  Cell &getCell() {return cell;}
   bool isFixed() const { return fixed; }
   // MODIFIERS
   void setOriginalPosition(const glm::vec3 &p) { original_position = p; }
@@ -27,15 +29,14 @@ public:
   void setAcceleration(const glm::vec3 &a) { acceleration = a; }
   void setMass(double m) { mass = m; }
   void setFixed(bool b) { fixed = b; }
-  void setCell(Cell *c){cell = c;}
-  Cell* getCell(){return cell;}
+
 private:
   // REPRESENTATION
   glm::vec3 original_position;
   glm::vec3 position;
   glm::vec3 velocity;
   glm::vec3 acceleration;
-  Cell *cell;
+  Cell cell;
   double mass;
   bool fixed;
 };
@@ -107,7 +108,6 @@ private:
   // correction thresholds
   double provot_structural_correction;
   double provot_shear_correction;
-
   // VBOs
   GLuint cloth_verts_VBO;
   GLuint cloth_tri_indices_VBO;
