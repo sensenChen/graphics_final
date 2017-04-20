@@ -125,20 +125,11 @@ void GLCanvas::Load(){
   cloth = NULL;
   delete fluid; 
   fluid = NULL;
-
-
-  std::cout<<args->fluid_file<<std::endl;
-  std::cout<<args->cloth_file<<std::endl;
-
+  if (args->cloth_file != "")
+    cloth = new Cloth(args);
   if (args->fluid_file != "")
     fluid = new Fluid(args);
-
-  if (args->cloth_file != "")
-    // fluid = new Fluid(args);
-    cloth = new Cloth(args);
-
-
-  // assert (cloth || fluid);
+  assert (cloth || fluid);
 }
 
 void GLCanvas::animate(){
@@ -146,7 +137,7 @@ void GLCanvas::animate(){
     // do 10 steps of animation before rendering
     for (int i = 0; i < 10; i++) {
       if (cloth) cloth->Animate();
-      // if (fluid) fluid->Animate();
+      if (fluid) fluid->Animate();
     }
   }
   setupVBOs();
@@ -167,7 +158,7 @@ void GLCanvas::initializeVBOs(){
 
 
   if (cloth) cloth->initializeVBOs();
-  // if (fluid) fluid->initializeVBOs();
+  if (fluid) fluid->initializeVBOs();
   HandleGLError("leaving initilizeVBOs()");
 }
 
@@ -184,7 +175,7 @@ void GLCanvas::setupVBOs(){
 
   bbox.setupVBOs();
   if (cloth) cloth->setupVBOs();
-  // if (fluid) fluid->setupVBOs();
+  if (fluid) fluid->setupVBOs();
   HandleGLError("leaving setupVBOs()");
 }
 
@@ -223,13 +214,13 @@ void GLCanvas::drawVBOs(const glm::mat4 &ProjectionMatrix,const glm::mat4 &ViewM
   HandleGLError("mid8 GlCanvas::drawVBOs()");
 
   if (cloth) cloth->drawVBOs();
-  // if (fluid) fluid->drawVBOs();
+  if (fluid) fluid->drawVBOs();
   HandleGLError("leaving GlCanvas::drawVBOs()");
 }
 
 void GLCanvas::cleanupVBOs(){
   if (cloth) cloth->cleanupVBOs();
-  // if (fluid) fluid->cleanupVBOs();
+  if (fluid) fluid->cleanupVBOs();
 }
 
 
@@ -334,7 +325,7 @@ void GLCanvas::keyboardCB(GLFWwindow* window, int key, int scancode, int action,
     case ' ':
       // a single step of animation
       if (cloth) cloth->Animate();
-      // if (fluid) fluid->Animate();
+      if (fluid) fluid->Animate();
       break; 
     case 'm':  case 'M': 
       args->particles = !args->particles;

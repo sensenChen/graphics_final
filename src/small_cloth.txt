@@ -19,6 +19,4 @@ fabric_weight 0.1
 f 0 0    0 0.5 0.1
 
 
-density 64
-
-initial_particles 0 1
+particles_position 2 2 0

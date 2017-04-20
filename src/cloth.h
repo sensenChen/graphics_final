@@ -19,6 +19,7 @@ public:
   const glm::vec3& getVelocity() const{ return velocity; }
   const glm::vec3& getAcceleration() const { return acceleration; }
   glm::vec3 getForce() const { return float(mass + cell.numParticles()*0.0002)*acceleration; }
+  int numFluidParticles() const{return cell.numParticles();}
   double getMass() const { return mass+cell.numParticles()*0.0002; }
   Cell &getCell() {return cell;}
   bool isFixed() const { return fixed; }
@@ -29,6 +30,9 @@ public:
   void setAcceleration(const glm::vec3 &a) { acceleration = a; }
   void setMass(double m) { mass = m; }
   void setFixed(bool b) { fixed = b; }
+   
+
+  
 
 private:
   // REPRESENTATION
@@ -37,6 +41,7 @@ private:
   glm::vec3 velocity;
   glm::vec3 acceleration;
   Cell cell;
+
   double mass;
   bool fixed;
 };
@@ -92,12 +97,17 @@ private:
                             const glm::vec3 &anormal, const glm::vec3 &bnormal, const glm::vec3 &cnormal,
                             const glm::vec3 &abcolor, const glm::vec3 &bccolor, const glm::vec3 &cacolor);
 
-
+  void ComputeNewVelocities();
+  void MoveParticles();
+  void ReassignParticles();
+  glm::vec3 AbsorbtionForce(int i, int j);
   // REPRESENTATION
   ArgParser *args;
   // grid data structure
+  double dx;  // dimensions of each grid cell
   int nx, ny;
   ClothParticle *particles;
+  std::vector<FluidParticle*> particles;
   BoundingBox box;
   // simulation parameters
   double damping;

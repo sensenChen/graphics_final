@@ -10,11 +10,14 @@ class FluidParticle {
 public:
   // accessor
   const glm::vec3& getPosition() const { return position; }
+  const glm::vec3& getVelocity() const { return velocity; }
   // modifer
   void setPosition(const glm::vec3 &p) { position = p; }
+  void setVelocity(const glm::vec3 &v) { velocity = v; }
 private:
   // representation
   glm::vec3 position;
+  glm::vec3 velocity;
 };
 
 // ==============================================================================
@@ -37,8 +40,8 @@ public:
     new_w_plus = 0;
   }
   ~Cell() { 
-    for (unsigned int i = 0; i < particles.size(); i++) {
-      delete particles[i]; }
+    //for (unsigned int i = 0; i < particles.size(); i++) {
+      //delete particles[i]; }
   }
   
   // =========

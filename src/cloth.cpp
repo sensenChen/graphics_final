@@ -8,9 +8,12 @@
 #include "utils.h"
 #include <math.h>
 #include "glm/gtx/string_cast.hpp"
+#include "fluid.h"
 
 // ================================================================================
 // ================================================================================
+
+float ab_f = 0.00000009;
 
 Cloth::Cloth(ArgParser *_args) {
   args =_args;
@@ -66,7 +69,7 @@ Cloth::Cloth(ArgParser *_args) {
       p.setVelocity(glm::vec3(0,0,0));
       p.setMass(mass);
       p.setFixed(false);
-      std::cout<<mass<<std::endl;
+      //std::cout<<mass<<std::endl;
     }
   }
 
@@ -82,25 +85,27 @@ Cloth::Cloth(ArgParser *_args) {
     p.setFixed(true);
     istr>>token;
   }
-  
-  //while(token=="particles_position")
-  //{
-    int p_x,p_y,p_num;
-    istr>>p_x>>p_y>>p_num;
-    //istr>>token;
-     
-        ClothParticle &c_w = getParticle(p_x,p_y);
-        Cell &cell = c_w.getCell();
-        for (int k = 0; k < p_num; ++k)
-        {
-          glm::vec3 pos = glm::vec3(p_x,p_y,0);
-          FluidParticle *f_p = new FluidParticle();
-          f_p->setPosition(pos);
-          cell.addParticle(f_p);
-        }
-        //std::cout<<cell.numParticles()<<std::endl;
-  //}   std::cout<<cell.numParticles()<<std::endl;
-        //std::cout<<(p.getCell()).numParticles()<<std::endl;
+  //where to put the particles and the number of particles in that cell 
+  /*int p_x,p_y,p_num;
+  istr>>p_x>>p_y>>p_num;
+  dx = (b.x - a.x)/(nx-1);
+  //std::cout<<dx<<std::endl;
+  //istr>>token;   
+  ClothParticle &c_w = getParticle(p_x,p_y);
+  Cell &cell = c_w.getCell();
+  for (int k = 0; k < p_num; ++k)
+  {
+    glm::vec3 pos = glm::vec3(args->mtrand()*dx,
+                              args->mtrand()*dx,
+                              0);
+    pos+=glm::vec3(p_x*dx,p_y*dx,0);
+    //std::cout<<glm::to_string(pos)<<std::endl;
+    FluidParticle *f_p = new FluidParticle();
+    f_p->setPosition(pos);
+    f_p->setVelocity(glm::vec3(0,0,0));
+    cell.addParticle(f_p);
+  }*/
+  //ComputeNewVelocities();      
   computeBoundingBox();
 }
 
@@ -179,8 +184,18 @@ void Cloth::Animate() {
     compute_provot_structural();
     compute_provot_shear();
   }
-  
-
+  ComputeNewVelocities();
+  MoveParticles();
+  ReassignParticles();
+  /*std::cout<<(getParticle(0,0).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(0,1).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(0,2).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(1,0).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(1,1).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(1,2).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(2,0).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(2,1).getCell()).numParticles()<<std::endl;
+  std::cout<<(getParticle(2,2).getCell()).numParticles()<<std::endl;*/
 }
 //calculate total structural force aroung ij
 glm::vec3 Cloth::compute_structural_force(int i, int j)
@@ -427,4 +442,203 @@ void Cloth::correct_position_2_particle(ClothParticle& pij,ClothParticle& pkl,in
     } 
   }
 }
+
+void Cloth::ComputeNewVelocities() {
+  double dt = args->timestep;
+  for (int i = 0; i < nx; ++i)
+  {
+    for (int j = 0; j < ny; ++j)
+    {
+      ClothParticle &c_p = getParticle(i,j);
+      Cell &cell = c_p.getCell();
+      std::vector<FluidParticle*> &particles=cell.getParticles();
+      for (int k = 0; k < particles.size(); ++k)
+      {
+       //std::cout<<glm::to_string(particles[k]->getVelocity())<<std::endl;
+       FluidParticle *f_p = particles[k];
+       glm::vec3 p_v = f_p->getVelocity();
+       glm::vec3 acceleration_ = glm::vec3(0,0.00098,0) + AbsorbtionForce(i,j)/0.2;
+       p_v += dt * acceleration_;
+       if (particles.size()<100)
+       {
+         f_p->setVelocity(glm::vec3(0,0,0));
+       }
+       else
+       f_p->setVelocity(p_v);
+       //std::cout<<glm::to_string(p_v)<<std::endl;
+      }
+    }
+  }
+}
+
+void Cloth::MoveParticles()
+{
+  double dt = args->timestep;
+  for (int i = 0; i < nx; ++i)
+  {
+    for (int j = 0; j < ny; ++j)
+    {
+      ClothParticle &c_p = getParticle(i,j);
+      Cell &cell = c_p.getCell();
+      std::vector<FluidParticle*> &particles=cell.getParticles();
+      for (int k = 0; k < particles.size(); ++k)
+      {
+       
+       FluidParticle *f_p = particles[k];
+       glm::vec3 p_v = f_p->getVelocity();
+       glm::vec3 pos = f_p->getPosition();
+       glm::vec3 new_pos = pos + p_v * dt;
+       f_p->setPosition(new_pos);
+      }
+    }
+  }
+}
+
+void Cloth::ReassignParticles()
+{
+  for (int i = 0; i < nx; ++i)
+  {
+    for (int j = 0; j < ny; ++j)
+    {
+      ClothParticle &c_p = getParticle(i,j);
+      Cell &cell = c_p.getCell();
+      std::vector<FluidParticle*> &particles=cell.getParticles();
+      for (int k = 0; k < particles.size(); ++k)
+      {
+       
+       FluidParticle *f_p = particles[k];
+       glm::vec3 pos = f_p->getPosition();
+       int i2 = int(floor(pos.x/dx));
+       int j2 = int(floor(pos.y/dx));
+       if (i != i2 || j != j2)
+       {
+         //std::cout<<i<<j<<" "<<i2<<j2<<std::endl;
+         cell.removeParticle(f_p);
+         if (i2>=0 && i2<nx)
+         {
+           if (j2>=0 && j2<ny)
+           {
+             ClothParticle &c_p2 = getParticle(i2,j2);
+             Cell &cell2 = c_p2.getCell();
+             cell2.addParticle(f_p);
+           }
+         }
+       }
+      }
+    }
+  }
+}
+
+glm::vec3 Cloth::AbsorbtionForce(int i,int j)
+{
+  ClothParticle &p_ij = getParticle(i,j);
+  glm::vec3 position_ij = p_ij.getPosition();
+  glm::vec3 total_force = glm::vec3(0,0,0);
+  glm::vec3 dir_;
+  float dis_;
+  int n_p_d;
+  if (i>0)
+  {
+    ClothParticle &p_0j = getParticle(i-1,j);
+    glm::vec3 position_0j = p_0j.getPosition();
+    dir_= normalize(position_0j - position_ij);
+    dis_ = length(position_0j - position_ij);
+    n_p_d = p_ij.numFluidParticles() - p_0j.numFluidParticles();
+    total_force += n_p_d*ab_f*dir_/dis_;
+    if (j>0)
+    {
+      ClothParticle &p_00 = getParticle(i-1,j-1);
+      glm::vec3 position_00 = p_00.getPosition();
+      dir_= normalize(position_00 - position_ij);
+      dis_ = length(position_00 - position_ij);
+      n_p_d = p_ij.numFluidParticles() - p_00.numFluidParticles();
+      total_force += n_p_d*ab_f*dir_/dis_;
+    }
+    if (j<ny-1)
+    {
+      ClothParticle &p_01 = getParticle(i-1,j+1);
+      glm::vec3 position_01 = p_01.getPosition();
+      dir_= normalize(position_01 - position_ij);
+      dis_ = length(position_01 - position_ij);
+      n_p_d = p_ij.numFluidParticles() - p_01.numFluidParticles();
+      total_force += n_p_d*ab_f*dir_/dis_;
+    }
+    
+  }
+  if (j>0)
+  {
+    ClothParticle &p_i0 = getParticle(i,j-1);
+    glm::vec3 position_i0 = p_i0.getPosition();
+    dir_= normalize(position_i0 - position_ij);
+    dis_ = length(position_i0 - position_ij);
+    n_p_d = p_ij.numFluidParticles() - p_i0.numFluidParticles();
+    total_force += n_p_d*ab_f*dir_/dis_;
+  }
+  if (j<ny-1)
+  {
+    ClothParticle &p_i1 = getParticle(i,j+1);
+    glm::vec3 position_i1 = p_i1.getPosition();
+    dir_= normalize(position_i1 - position_ij);
+    dis_ = length(position_i1 - position_ij);
+    n_p_d = p_ij.numFluidParticles() - p_i1.numFluidParticles();
+    total_force += n_p_d*ab_f*dir_/dis_;
+  }
+  if (i<nx-1)
+  {
+    ClothParticle &p_1j = getParticle(i+1,j);
+    glm::vec3 position_1j = p_1j.getPosition();
+    dir_= normalize(position_1j - position_ij);
+    dis_ = length(position_1j - position_ij);
+    n_p_d = p_ij.numFluidParticles() - p_1j.numFluidParticles();
+    total_force += n_p_d*ab_f*dir_/dis_;
+    if (j>0)
+    {
+      ClothParticle &p_10 = getParticle(i+1,j-1);
+      glm::vec3 position_10 = p_10.getPosition();
+      dir_= normalize(position_10 - position_ij);
+      dis_ = length(position_10 - position_ij);
+      n_p_d = p_ij.numFluidParticles() - p_10.numFluidParticles();
+      total_force += n_p_d*ab_f*dir_/dis_;
+    }
+    if (j<ny-1)
+    {
+      ClothParticle &p_11 = getParticle(i+1,j+1);
+      glm::vec3 position_11 = p_11.getPosition();
+      dir_= normalize(position_11 - position_ij);
+      dis_ = length(position_11 - position_ij);
+      n_p_d = p_ij.numFluidParticles() - p_11.numFluidParticles();
+      total_force += n_p_d*ab_f*dir_/dis_;
+    }
+  }
+
+
+
+  return total_force;
+
+}
+
+/*void Cloth::GenerateFP()
+{
+  for (int i = 0; i < 10; ++i)
+  {
+    FluidParticle *p = new FluidParticle();
+    p->setPosition(pos);
+  }
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

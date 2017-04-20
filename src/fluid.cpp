@@ -400,6 +400,8 @@ double Fluid::AdjustForIncompressibility() {
   double v_y_s;
   double v_x_w;
   double v_x_e;
+  double v_y_c;
+  double v_x_c;
   int num_faces;
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
@@ -497,6 +499,8 @@ double Fluid::AdjustForIncompressibility() {
       }
     }
   }
+
+
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
       for (int k = 0; k < nz; k++) {
@@ -507,46 +511,62 @@ double Fluid::AdjustForIncompressibility() {
         Cell *cell_s = getCell(i,j-1,k);
         if (cell_c->getStatus()==CELL_SURFACE)
         {
-          if (cell_n->getStatus()==CELL_EMPTY&&
-            cell_w->getStatus()==CELL_EMPTY&&
-            cell_e->getStatus()==CELL_EMPTY&&
-            cell_s->getStatus()==CELL_EMPTY)
+
+          
+
+          if ((cell_n->getStatus()==CELL_EMPTY)&&cell_s->getStatus()==CELL_EMPTY)
           {
-            v_y_n = get_new_v_plus(i,j,k);
+            v_y_n = get_v_plus(i,j+1,k);
             v_y_n += (gravity_.y * dt_);
-            set_new_v_plus(i,j,k,v_y_n);
-            v_y_s = get_new_v_plus(i,j-1,k);
+            set_new_v_plus(i,j+1,k,-v_y_n);
+            v_y_s = get_v_plus(i,j-1,k);
             v_y_s += (gravity_.y * dt_);
-            set_new_v_plus(i,j-1,k,v_y_s);
+            set_new_v_plus(i,j-1,k,-v_y_s);
+            
           }
-          else
+          else if ((cell_n->getStatus()==CELL_EMPTY)&&cell_s->getStatus()!=CELL_EMPTY)
           {
-            if (cell_n->getStatus()==CELL_EMPTY&&cell_s->getStatus()!=CELL_EMPTY)
-            {
-              v_y_s = get_new_v_plus(i,j-1,k);
-              set_new_v_plus(i,j,k,v_y_s);
-            }
-            if (cell_n->getStatus()!=CELL_EMPTY&&cell_s->getStatus()==CELL_EMPTY)
-            {
-              v_y_n = get_new_v_plus(i,j,k);
-              set_new_v_plus(i,j-1,k,v_y_n);
-            }
-            if (cell_w->getStatus()==CELL_EMPTY&&cell_e->getStatus()!=CELL_EMPTY)
-            {
-              v_x_e = get_new_u_plus(i,j,k);
-              set_new_u_plus(i-1,j,k,v_x_e);
-            }
-            if (cell_w->getStatus()!=CELL_EMPTY&&cell_e->getStatus()==CELL_EMPTY)
-            {
-              v_x_w = get_new_u_plus(i-1,j,k);
-              set_new_u_plus(i,j,k,v_x_w);
-            }
+            v_y_s = get_new_v_plus(i,j+1,k);
+            set_new_v_plus(i,j-1,k,-v_y_s);
           }
+          else if (cell_n->getStatus()!=CELL_EMPTY&&cell_s->getStatus()==CELL_EMPTY)
+          {
+            v_y_n = get_new_v_plus(i,j-1,k);
+            set_new_v_plus(i,j-1,k,-v_y_n);
+          }
+          
+
+
+          if (cell_w->getStatus()==CELL_EMPTY&&cell_e->getStatus()==CELL_EMPTY)
+          {
+            v_x_e = get_u_plus(i-1,j,k);
+            set_new_u_plus(i-1,j,k,-v_x_e);
+            v_x_w = get_u_plus(i+1,j,k);
+            set_new_u_plus(i+1,j,k,-v_x_w);
+          }
+          else if (cell_w->getStatus()==CELL_EMPTY&&cell_e->getStatus()!=CELL_EMPTY)
+          {
+            v_x_e = get_new_u_plus(i+1,j,k);
+            set_new_u_plus(i-1,j,k,-v_x_e);
+          }
+          else if (cell_w->getStatus()!=CELL_EMPTY&&cell_e->getStatus()==CELL_EMPTY)
+          {
+            v_x_w = get_new_u_plus(i-1,j,k);
+            set_new_u_plus(i+1,j,k,-v_x_w);
+          }
+          
+
+
+
+
+
         }
       }
     }
   }
   
+
+
   for (int i = 0; i < nx; i++) {
     for (int j = 0; j < ny; j++) {
       for (int k = 0; k < nz; k++) {
