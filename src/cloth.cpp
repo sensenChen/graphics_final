@@ -86,7 +86,7 @@ Cloth::Cloth(ArgParser *_args) {
     istr>>token;
   }
   //where to put the particles and the number of particles in that cell 
-  /*int p_x,p_y,p_num;
+  int p_x,p_y,p_num;
   istr>>p_x>>p_y>>p_num;
   dx = (b.x - a.x)/(nx-1);
   //std::cout<<dx<<std::endl;
@@ -104,7 +104,7 @@ Cloth::Cloth(ArgParser *_args) {
     f_p->setPosition(pos);
     f_p->setVelocity(glm::vec3(0,0,0));
     cell.addParticle(f_p);
-  }*/
+  }
   //ComputeNewVelocities();      
   computeBoundingBox();
 }

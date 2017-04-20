@@ -36,7 +36,7 @@ void main(){
                ( mycolor.x > 0.1 &&
                  mycolor.y > 0.1 &&
                  mycolor.z > 0.1) ) {
-            MaterialDiffuseColor = 0.6 * vec3(1,1,1);
+            MaterialDiffuseColor = mycolor;;
           } else {
             MaterialDiffuseColor = mycolor;
             if (mycolor.x < 0.1 &&

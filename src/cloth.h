@@ -107,7 +107,7 @@ private:
   double dx;  // dimensions of each grid cell
   int nx, ny;
   ClothParticle *particles;
-  std::vector<FluidParticle*> particles;
+  //std::vector<FluidParticle*> particles;
   BoundingBox box;
   // simulation parameters
   double damping;

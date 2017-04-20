@@ -14,7 +14,7 @@ void addEdgeGeometry(std::vector<VBOPosNormalColor> &verts,
                      float a_th,float b_th) {
   
   // find perpendicular axes
-  float length = glm::length(a-b);
+  /*float length = glm::length(a-b);
   if (length < 0.01*std::min(a_th,b_th)) return;
   glm::vec3 dir = glm::normalize(b-a);
   glm::vec3 tmp = glm::cross(dir,glm::vec3(1,0,0));
@@ -70,5 +70,5 @@ void addEdgeGeometry(std::vector<VBOPosNormalColor> &verts,
   verts.push_back(VBOPosNormalColor(b+two*b_th+one*b_th,dir,bcolor));
   verts.push_back(VBOPosNormalColor(b+two*b_th-one*b_th,dir,bcolor));
   tri_indices.push_back(VBOIndexedTri(start,start+1,start+2));
-  tri_indices.push_back(VBOIndexedTri(start,start+2,start+3));
+  tri_indices.push_back(VBOIndexedTri(start,start+2,start+3));*/
 }
