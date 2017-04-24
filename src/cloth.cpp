@@ -34,7 +34,7 @@ Cloth::Cloth(ArgParser *_args) {
   istr >> token >> provot_shear_correction; assert (token == "provot_shear_correction");
 
   // the cloth dimensions
-  istr >> token >> nx >> ny; 
+  istr >> token >> nx >> ny;
   assert (token == "m");
   assert (nx >= 2 && ny >= 2);
 
@@ -85,12 +85,12 @@ Cloth::Cloth(ArgParser *_args) {
     p.setFixed(true);
     istr>>token;
   }
-  //where to put the particles and the number of particles in that cell 
+  //where to put the particles and the number of particles in that cell
   int p_x,p_y,p_num;
   istr>>p_x>>p_y>>p_num;
   dx = (b.x - a.x)/(nx-1);
   //std::cout<<dx<<std::endl;
-  //istr>>token;   
+  //istr>>token;
   ClothParticle &c_w = getParticle(p_x,p_y);
   Cell &cell = c_w.getCell();
   for (int k = 0; k < p_num; ++k)
@@ -105,9 +105,9 @@ Cloth::Cloth(ArgParser *_args) {
     f_p->setVelocity(glm::vec3(0,0,0));
     cell.addParticle(f_p);
   }
-  //ComputeNewVelocities(); 
+  //ComputeNewVelocities();
   GenerateFP();
-  std::cout<<water_particles.size()<<std::endl;     
+  std::cout<<water_particles.size()<<std::endl;
   computeBoundingBox();
 }
 
@@ -126,11 +126,10 @@ void Cloth::computeBoundingBox() {
 // ================================================================================
 
 
-
 void Cloth::Animate() {
 
 
-  // *********************************************************************  
+  // *********************************************************************
   // ASSIGNMENT:
   //
   // Compute the forces on each particle, and update the state
@@ -138,8 +137,8 @@ void Cloth::Animate() {
   //
   // Also, this is where you'll put the Provot correction for super-elasticity
   //
-  // *********************************************************************    
-  
+  // *********************************************************************
+
 
   // commented out because an animated bounding box can be weird
   //std::cout<<provot_structural_correction<<std::endl;
@@ -178,7 +177,7 @@ void Cloth::Animate() {
         pij.setPosition(position_ij);
         //do provot structural&shear correction 6 times
       }
-      
+
     }
   }
   for (int k = 0; k < 4; ++k)
@@ -246,8 +245,8 @@ glm::vec3 Cloth::compute_shear_force(int i, int j)
   {
     total_shear_force += force_between_2_point(i,j,i+1,j-1,1);
   }
-  return total_shear_force; 
-}   
+  return total_shear_force;
+}
 //compute total bend force around ij
 glm::vec3 Cloth::compute_bend_force(int i, int j)
 {
@@ -282,7 +281,7 @@ glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
   glm::vec3 pij;// position of the calculate point
   glm::vec3 pkl;// position of other point
   float l0;// natural lenght of the spring
-  glm::vec3 lv;//vector from pij to pkl 
+  glm::vec3 lv;//vector from pij to pkl
   glm::vec3 v;//normalized l
   p1 = getParticle(i,j);
   p2 = getParticle(k,l);
@@ -308,7 +307,7 @@ glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
     force_ = float(k_bend) * (lv - l0 * v);
   //force_ *= -1;
   return force_;
-} 
+}
 
 void Cloth::compute_provot_structural()
 {
@@ -445,7 +444,7 @@ void Cloth::correct_position_2_particle(ClothParticle& pij,ClothParticle& pkl,in
         pij.setPosition(position_ij + org_l_ij_kl);
       else if (!pkl.isFixed())
         pkl.setPosition(position_kl - org_l_ij_kl);
-    } 
+    }
   }
 }
 
@@ -470,7 +469,7 @@ void Cloth::ComputeNewVelocities() {
          f_p->setVelocity(glm::vec3(0,0,0));
        }
        else
-       //p_v*=0.5; 
+       //p_v*=0.5;
        f_p->setVelocity(p_v);
        //std::cout<<glm::to_string(p_v)<<std::endl;
       }
@@ -490,7 +489,7 @@ void Cloth::MoveParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-       
+
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
        glm::vec3 pos = f_p->getPosition();
@@ -512,7 +511,7 @@ void Cloth::ReassignParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-       
+
        FluidParticle *f_p = particles[k];
        glm::vec3 pos = f_p->getPosition();
        int i2 = int(floor(pos.x/dx));
@@ -570,7 +569,7 @@ glm::vec3 Cloth::AbsorbtionForce(int i,int j)
       n_p_d = p_ij.numFluidParticles() - p_01.numFluidParticles();
       total_force += n_p_d*ab_f*dir_/dis_;
     }
-    
+
   }
   if (j>0)
   {
@@ -629,9 +628,9 @@ void Cloth::GenerateFP()
   for (int i = 0; i < 1; ++i)
   {
     FluidParticle *p = new FluidParticle();
-    glm::vec3 pos = glm::vec3(args->mtrand()*0.10+0.5,
-                                args->mtrand()*0.10+1.2,
-                                args->mtrand()*0.2+1.5);
+    glm::vec3 pos = glm::vec3(args->mtrand()*0.10+0.45q,
+                                args->mtrand()*0.10+1.1,
+                                args->mtrand()*0.2+2);
     p->setPosition(pos);
     p->setVelocity(glm::vec3(0,0,-4) );
     water_particles.push_back(p);
@@ -651,21 +650,11 @@ void Cloth::new_p_water_particles()
     pos+=vel*dt;
     p->setPosition(pos);
     p->setVelocity(vel);
-    //std::cout<<glm::to_string(vel)<<std::endl;
+    // std::cout<<glm::to_string(pos)<<std::endl;
   }
 }
 
+/*void Cloth::check_collision()
+{
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+}*/

@@ -3,6 +3,7 @@
 #include "fluid.h"
 #include "argparser.h"
 #include "camera.h"
+#include "mesh.h"
 
 // ========================================================
 // static variables of GLCanvas class
@@ -10,6 +11,7 @@
 ArgParser* GLCanvas::args = NULL;
 Cloth* GLCanvas::cloth = NULL;
 Fluid* GLCanvas::fluid = NULL;
+Mesh* mesh = NULL;
 Camera* GLCanvas::camera = NULL;
 BoundingBox GLCanvas::bbox;
 GLFWwindow* GLCanvas::window = NULL;
@@ -49,6 +51,7 @@ void GLCanvas::initialize(ArgParser *_args) {
   args = _args;
   cloth = NULL;
   fluid = NULL;
+  mesh = NULL;
 
   glfwSetErrorCallback(error_callback);
 
@@ -57,7 +60,7 @@ void GLCanvas::initialize(ArgParser *_args) {
     std::cerr << "ERROR: Failed to initialize GLFW" << std::endl;
     exit(1);
   }
-  
+
   // We will ask it to specifically open an OpenGL 3.2 context
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -107,24 +110,31 @@ void GLCanvas::initialize(ArgParser *_args) {
   GLCanvas::setupVBOs();
 
   // ===========================
-  // initial placement of camera 
+  // initial placement of camera
   // look at an object scaled & positioned to just fit in the box (-1,-1,-1)->(1,1,1)
   glm::vec3 camera_position = glm::vec3(1,3,8);
   glm::vec3 point_of_interest = glm::vec3(0,0,0);
   glm::vec3 up = glm::vec3(0,1,0);
   float angle = 20.0;
   camera = new PerspectiveCamera(camera_position, point_of_interest, up, angle);
-  camera->glPlaceCamera(); 
+  camera->glPlaceCamera();
 
   HandleGLError("finished glcanvas initialize");
 }
 
 
 void GLCanvas::Load(){
-  delete cloth; 
+  delete cloth;
   cloth = NULL;
-  delete fluid; 
+  delete fluid;
   fluid = NULL;
+  delete mesh;
+
+
+  mesh = new Mesh(args);
+  mesh->Load();
+
+
   if (args->cloth_file != "")
     cloth = new Cloth(args);
   if (args->fluid_file != "")
@@ -159,6 +169,7 @@ void GLCanvas::initializeVBOs(){
 
   if (cloth) cloth->initializeVBOs();
   if (fluid) fluid->initializeVBOs();
+  mesh->initializeVBOs();
   HandleGLError("leaving initilizeVBOs()");
 }
 
@@ -170,12 +181,14 @@ void GLCanvas::setupVBOs(){
     }
   } else {
     assert (fluid != NULL);
-    bbox.Set(fluid->getBoundingBox()); 
+    bbox.Set(fluid->getBoundingBox());
   }
 
   bbox.setupVBOs();
   if (cloth) cloth->setupVBOs();
   if (fluid) fluid->setupVBOs();
+  mesh->setupVBOs();
+
   HandleGLError("leaving setupVBOs()");
 }
 
@@ -213,14 +226,17 @@ void GLCanvas::drawVBOs(const glm::mat4 &ProjectionMatrix,const glm::mat4 &ViewM
   glUniform1i(GLCanvas::colormodeID, 0);
   HandleGLError("mid8 GlCanvas::drawVBOs()");
 
+
   if (cloth) cloth->drawVBOs();
   if (fluid) fluid->drawVBOs();
+  mesh->drawVBOs();
   HandleGLError("leaving GlCanvas::drawVBOs()");
 }
 
 void GLCanvas::cleanupVBOs(){
   if (cloth) cloth->cleanupVBOs();
   if (fluid) fluid->cleanupVBOs();
+  mesh->cleanupVBOs();
 }
 
 
@@ -252,7 +268,7 @@ void GLCanvas::mousebuttonCB(GLFWwindow *window, int which_button, int action, i
       middleMousePressed = false;
     }
   }
-}	
+}
 
 // ========================================================
 // Callback function for mouse drag
@@ -276,10 +292,10 @@ void GLCanvas::mousemotionCB(GLFWwindow *window, double x, double y) {
     }
     // allow reasonable control for a non-3 button mouse
     if (controlKeyPressed) {
-      camera->truckCamera(mouseX-x, y-mouseY);    
+      camera->truckCamera(mouseX-x, y-mouseY);
     }
     if (altKeyPressed) {
-      camera->dollyCamera(y-mouseY);    
+      camera->dollyCamera(y-mouseY);
     }
   }
   mouseX = x;
@@ -317,7 +333,7 @@ void GLCanvas::keyboardCB(GLFWwindow* window, int key, int scancode, int action,
     case 'a': case 'A':
       // toggle continuous animation
       args->animate = !args->animate;
-      if (args->animate) 
+      if (args->animate)
         printf ("animation started, press 'A' to stop\n");
       else
         printf ("animation stopped, press 'A' to start\n");
@@ -326,52 +342,52 @@ void GLCanvas::keyboardCB(GLFWwindow* window, int key, int scancode, int action,
       // a single step of animation
       if (cloth) cloth->Animate();
       if (fluid) fluid->Animate();
-      break; 
-    case 'm':  case 'M': 
+      break;
+    case 'm':  case 'M':
       args->particles = !args->particles;
-      break; 
-    case 'v':  case 'V': 
+      break;
+    case 'v':  case 'V':
       args->velocity = !args->velocity;
-      break; 
-    case 'f':  case 'F': 
+      break;
+    case 'f':  case 'F':
       args->force = !args->force;
-      break; 
+      break;
     case 'e':  case 'E':   // "faces"/"edges"
       args->face_velocity = !args->face_velocity;
-      break; 
-    case 'd':  case 'D': 
+      break;
+    case 'd':  case 'D':
       args->dense_velocity = (args->dense_velocity+1)%4;
-      break; 
-    case 's':  case 'S': 
+      break;
+    case 's':  case 'S':
       args->surface = !args->surface;
-      break; 
+      break;
     case 'w':  case 'W':
       args->wireframe = !args->wireframe;
       break;
     case 'b':  case 'B':
       args->bounding_box = !args->bounding_box;
       break;
-    case 'c':  case 'C': 
+    case 'c':  case 'C':
       args->cubes = !args->cubes;
-      break; 
-    case 'p':  case 'P': 
+      break;
+    case 'p':  case 'P':
       args->pressure = !args->pressure;
-      break; 
-    case 'r':  case 'R': 
+      break;
+    case 'r':  case 'R':
       // reset system
       cleanupVBOs();
       Load();
       initializeVBOs();
       setupVBOs();
-      break; 
+      break;
     case '+': case '=':
       std::cout << "timestep doubled:  " << args->timestep << " -> ";
-      args->timestep *= 2.0; 
+      args->timestep *= 2.0;
       std::cout << args->timestep << std::endl;
       break;
     case '-': case '_':
       std::cout << "timestep halved:  " << args->timestep << " -> ";
-      args->timestep /= 2.0; 
+      args->timestep /= 2.0;
       std::cout << args->timestep << std::endl;
       break;
     case 'q':  case 'Q':
@@ -396,7 +412,7 @@ GLuint LoadShaders(const std::string &vertex_file_path,const std::string &fragme
   // Create the shaders
   GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
   GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-  
+
   // Read the Vertex Shader code from the file
   std::string VertexShaderCode;
   std::ifstream VertexShaderStream(vertex_file_path.c_str(), std::ios::in);
@@ -421,61 +437,61 @@ GLuint LoadShaders(const std::string &vertex_file_path,const std::string &fragme
     std::cerr << "ERROR: cannot open " << vertex_file_path << std::endl;
     exit(0);
   }
-  
+
   GLint Result = GL_FALSE;
-  
+
   // Compile Vertex Shader
   std::cout << "Compiling shader : " << vertex_file_path << std::endl;
   char const * VertexSourcePointer = VertexShaderCode.c_str();
   glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
   glCompileShader(VertexShaderID);
- 
+
   // Check Vertex Shader
   glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-  if (Result != GL_TRUE) {  
+  if (Result != GL_TRUE) {
     GLsizei log_length = 0;
     GLchar message[1024];
     glGetShaderInfoLog(VertexShaderID, 1024, &log_length, message);
     std::cout << "VERTEX ERROR " << message << std::endl;
     exit(1);
   }
-  
+
   // Compile Fragment Shader
   std::cout << "Compiling shader : " << fragment_file_path << std::endl;
   char const * FragmentSourcePointer = FragmentShaderCode.c_str();
   glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
   glCompileShader(FragmentShaderID);
-  
+
   // Check Fragment Shader
   glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-  if (Result != GL_TRUE) {  
+  if (Result != GL_TRUE) {
     GLsizei log_length = 0;
     GLchar message[1024];
     glGetShaderInfoLog(FragmentShaderID, 1024, &log_length, message);
     std::cout << "FRAGMENT ERROR " << message << std::endl;
     exit(1);
   }
-  
+
   // Link the program
   std::cout << "Linking shader program" << std::endl;
   GLuint ProgramID = glCreateProgram();
   glAttachShader(ProgramID, VertexShaderID);
   glAttachShader(ProgramID, FragmentShaderID);
   glLinkProgram(ProgramID);
-  
+
   // Check the program
   glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-  if (Result != GL_TRUE) {  
+  if (Result != GL_TRUE) {
     GLsizei log_length = 0;
     GLchar message[1024];
     glGetShaderInfoLog(ProgramID, 1024, &log_length, message);
     std::cout << "SHADER PROGRAM ERROR " << message << std::endl;
     exit(1);
   }
-  
+
   glDeleteShader(VertexShaderID);
   glDeleteShader(FragmentShaderID);
-  
+
   return ProgramID;
 }
 
@@ -528,5 +544,3 @@ int HandleGLError(const std::string &message, bool ignore) {
 
 // ========================================================
 // ========================================================
-
-
