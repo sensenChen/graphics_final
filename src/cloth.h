@@ -101,13 +101,15 @@ private:
   void MoveParticles();
   void ReassignParticles();
   glm::vec3 AbsorbtionForce(int i, int j);
+  void GenerateFP();
+  void new_p_water_particles();
   // REPRESENTATION
   ArgParser *args;
   // grid data structure
   double dx;  // dimensions of each grid cell
   int nx, ny;
   ClothParticle *particles;
-  //std::vector<FluidParticle*> particles;
+  std::vector<FluidParticle*> water_particles;
   BoundingBox box;
   // simulation parameters
   double damping;
@@ -125,7 +127,7 @@ private:
   GLuint cloth_velocity_tri_indices_VBO;
   GLuint cloth_force_verts_VBO;
   GLuint cloth_force_tri_indices_VBO;
-
+  GLuint fluid_particles_VBO;
   // data for rendering
   std::vector<VBOPosNormalColor> cloth_verts; 
   std::vector<VBOIndexedTri> cloth_tri_indices;
@@ -133,6 +135,7 @@ private:
   std::vector<VBOIndexedTri> cloth_velocity_tri_indices;
   std::vector<VBOPosNormalColor> cloth_force_verts; 
   std::vector<VBOIndexedTri> cloth_force_tri_indices;
+  std::vector<VBOPosNormalColor> fluid_particles;
 };
 
 // ========================================================================

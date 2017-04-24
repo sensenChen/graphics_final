@@ -17,6 +17,8 @@ void Cloth::initializeVBOs() {
 
   glGenBuffers(1, &cloth_force_verts_VBO);
   glGenBuffers(1, &cloth_force_tri_indices_VBO);
+
+  glGenBuffers(1, &fluid_particles_VBO);
 }
 
 
@@ -75,7 +77,7 @@ void Cloth::setupVBOs() {
   cloth_velocity_tri_indices.clear();
   cloth_force_verts.clear();
   cloth_force_tri_indices.clear();
-
+  fluid_particles.clear();
 
   // like the last assignment...  to make wireframe edges...
   //
@@ -95,7 +97,11 @@ void Cloth::setupVBOs() {
   //   |/                     \|
   //   d-----------------------c
   //
-
+  for (int iter = 0; iter < water_particles.size(); iter++) {
+    FluidParticle *p = water_particles[iter];
+    glm::vec3 v = p->getPosition();
+          fluid_particles.push_back(VBOPosNormalColor(v));
+  }
 
   // mesh surface positions & normals
   for (int i = 0; i < nx-1; i++) {
@@ -239,7 +245,10 @@ void Cloth::setupVBOs() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,cloth_force_tri_indices_VBO); 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(VBOIndexedTri)*cloth_force_tri_indices.size(),&cloth_force_tri_indices[0],GL_STATIC_DRAW);
   }
-
+  if (fluid_particles.size() > 0) {
+    glBindBuffer(GL_ARRAY_BUFFER,fluid_particles_VBO); 
+    glBufferData(GL_ARRAY_BUFFER,sizeof(VBOPosNormalColor)*fluid_particles.size(),&fluid_particles[0],GL_STATIC_DRAW); 
+  }
   HandleGLError("leaving setup cloth");
 }
 
@@ -260,7 +269,20 @@ void Cloth::drawVBOs() {
     glDisableVertexAttribArray(0);
   }
   HandleGLError("points done cloth::drawVBOs()");
-
+  if (fluid_particles.size() > 0) {
+    glPointSize(5);
+    glBindBuffer(GL_ARRAY_BUFFER, fluid_particles_VBO);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(glm::vec3),(void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,3*sizeof(glm::vec3),(void*)sizeof(glm::vec3) );
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT,GL_FALSE,3*sizeof(glm::vec3), (void*)(sizeof(glm::vec3)*2));
+    glDrawArrays(GL_POINTS, 0, fluid_particles.size());
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+  }
   // =====================================================================================
   // render the cloth surface
   // =====================================================================================
@@ -346,6 +368,8 @@ void Cloth::cleanupVBOs() {
 
   glDeleteBuffers(1, &cloth_force_verts_VBO);
   glDeleteBuffers(1, &cloth_force_tri_indices_VBO);
+
+  glDeleteBuffers(1, &fluid_particles_VBO);
 }
 
 

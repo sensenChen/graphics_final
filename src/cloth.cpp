@@ -14,7 +14,7 @@
 // ================================================================================
 
 float ab_f = 0.00000009;
-
+int count_ = 0;
 Cloth::Cloth(ArgParser *_args) {
   args =_args;
 
@@ -105,7 +105,9 @@ Cloth::Cloth(ArgParser *_args) {
     f_p->setVelocity(glm::vec3(0,0,0));
     cell.addParticle(f_p);
   }
-  //ComputeNewVelocities();      
+  //ComputeNewVelocities(); 
+  GenerateFP();
+  std::cout<<water_particles.size()<<std::endl;     
   computeBoundingBox();
 }
 
@@ -187,6 +189,10 @@ void Cloth::Animate() {
   ComputeNewVelocities();
   MoveParticles();
   ReassignParticles();
+  new_p_water_particles();
+  if(count_%3==0)
+  GenerateFP();
+  count_++;
   /*std::cout<<(getParticle(0,0).getCell()).numParticles()<<std::endl;
   std::cout<<(getParticle(0,1).getCell()).numParticles()<<std::endl;
   std::cout<<(getParticle(0,2).getCell()).numParticles()<<std::endl;
@@ -457,13 +463,14 @@ void Cloth::ComputeNewVelocities() {
        //std::cout<<glm::to_string(particles[k]->getVelocity())<<std::endl;
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
-       glm::vec3 acceleration_ = glm::vec3(0,0.00098,0) + AbsorbtionForce(i,j)/0.2;
+       glm::vec3 acceleration_ = glm::vec3(0,-0.08,0) + AbsorbtionForce(i,j)/0.2;
        p_v += dt * acceleration_;
        if (particles.size()<100)
        {
          f_p->setVelocity(glm::vec3(0,0,0));
        }
        else
+       //p_v*=0.5; 
        f_p->setVelocity(p_v);
        //std::cout<<glm::to_string(p_v)<<std::endl;
       }
@@ -617,16 +624,36 @@ glm::vec3 Cloth::AbsorbtionForce(int i,int j)
 
 }
 
-/*void Cloth::GenerateFP()
+void Cloth::GenerateFP()
 {
-  for (int i = 0; i < 10; ++i)
+  for (int i = 0; i < 1; ++i)
   {
     FluidParticle *p = new FluidParticle();
+    glm::vec3 pos = glm::vec3(args->mtrand()*0.10+0.5,
+                                args->mtrand()*0.10+1.2,
+                                args->mtrand()*0.2+1.5);
     p->setPosition(pos);
+    p->setVelocity(glm::vec3(0,0,-4) );
+    water_particles.push_back(p);
+
   }
-}*/
+}
 
-
+void Cloth::new_p_water_particles()
+{
+  float dt = args->timestep;
+  for (int i = 0; i < water_particles.size(); ++i)
+  {
+    FluidParticle *p = water_particles[i];
+    glm::vec3 pos = p->getPosition();
+    glm::vec3 vel = p->getVelocity();
+    vel.y+=dt*-9.8;
+    pos+=vel*dt;
+    p->setPosition(pos);
+    p->setVelocity(vel);
+    //std::cout<<glm::to_string(vel)<<std::endl;
+  }
+}
 
 
 
