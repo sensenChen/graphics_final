@@ -291,28 +291,26 @@ private:
       glm::vec3 b = (*t)[1]->getPos() * float(.4);
       glm::vec3 c = (*t)[2]->getPos() * float(.4);
 
-      a.x += 8.3;
-      b.x += 8.3;
-      c.x += 8.3;
+      a.x += (8.3 + args->pipex);
+      b.x += (8.3 + args->pipex);
+      c.x += (8.3 + args->pipex);
 
+      a.y += (5.4+ args->pipey);
+      b.y += (5.4 + args->pipey);
+      c.y += (5.4 + args->pipey);
 
-      a.y += 5.4;
-      b.y += 5.4;
-      c.y += 5.4;
-
-      a.z += 2;
-      b.z += 2;
-      c.z += 2;
-
+      a.z += (2 + args->pipez);
+      b.z += (2 + args->pipez);
+      c.z += (2 + args->pipez);
 
       glm::vec3 na = computeNormal(a,b,c);
       glm::vec3 nb = na;
       glm::vec3 nc = na;
 
       int start = mesh_tri_verts.size();
-      mesh_tri_verts.push_back(VBOPosNormalColor(a,na,mesh_color));
-      mesh_tri_verts.push_back(VBOPosNormalColor(b,nb,mesh_color));
-      mesh_tri_verts.push_back(VBOPosNormalColor(c,nc,mesh_color));
+      mesh_tri_verts.push_back(VBOPosNormalColor(a,na,glm::vec3(0.5,0.25,0)));
+      mesh_tri_verts.push_back(VBOPosNormalColor(b,nb,glm::vec3(0.5,0.25,0)));
+      mesh_tri_verts.push_back(VBOPosNormalColor(c,nc,glm::vec3(0.5,0.25,0)));
       mesh_tri_indices.push_back(VBOIndexedTri(start,start+1,start+2));
     }
 

@@ -628,9 +628,9 @@ void Cloth::GenerateFP()
   for (int i = 0; i < 1; ++i)
   {
     FluidParticle *p = new FluidParticle();
-    glm::vec3 pos = glm::vec3(args->mtrand()*0.10+0.45q,
-                                args->mtrand()*0.10+1.1,
-                                args->mtrand()*0.2+2);
+    glm::vec3 pos = glm::vec3(args->mtrand()*0.10+0.45 + args->pipex,
+                              args->mtrand()*0.10+1.1 + args->pipey,
+                              args->mtrand()*0.2+2 + args->pipez);
     p->setPosition(pos);
     p->setVelocity(glm::vec3(0,0,-4) );
     water_particles.push_back(p);
