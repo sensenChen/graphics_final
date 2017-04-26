@@ -13,8 +13,9 @@
 // ================================================================================
 // ================================================================================
 
-float ab_f = 0.00000009;
+float ab_f = 0.00009;
 int count_ = 0;
+double error_ = 0.00001;
 Cloth::Cloth(ArgParser *_args) {
   args =_args;
 
@@ -34,7 +35,7 @@ Cloth::Cloth(ArgParser *_args) {
   istr >> token >> provot_shear_correction; assert (token == "provot_shear_correction");
 
   // the cloth dimensions
-  istr >> token >> nx >> ny;
+  istr >> token >> nx >> ny; 
   assert (token == "m");
   assert (nx >= 2 && ny >= 2);
 
@@ -85,12 +86,12 @@ Cloth::Cloth(ArgParser *_args) {
     p.setFixed(true);
     istr>>token;
   }
-  //where to put the particles and the number of particles in that cell
+  //where to put the particles and the number of particles in that cell 
   int p_x,p_y,p_num;
   istr>>p_x>>p_y>>p_num;
   dx = (b.x - a.x)/(nx-1);
   //std::cout<<dx<<std::endl;
-  //istr>>token;
+  //istr>>token;   
   ClothParticle &c_w = getParticle(p_x,p_y);
   Cell &cell = c_w.getCell();
   for (int k = 0; k < p_num; ++k)
@@ -105,9 +106,9 @@ Cloth::Cloth(ArgParser *_args) {
     f_p->setVelocity(glm::vec3(0,0,0));
     cell.addParticle(f_p);
   }
-  //ComputeNewVelocities();
-  GenerateFP();
-  std::cout<<water_particles.size()<<std::endl;
+  //ComputeNewVelocities(); 
+  //GenerateFP();
+  //std::cout<<water_particles.size()<<std::endl;     
   computeBoundingBox();
 }
 
@@ -126,10 +127,11 @@ void Cloth::computeBoundingBox() {
 // ================================================================================
 
 
+
 void Cloth::Animate() {
 
 
-  // *********************************************************************
+  // *********************************************************************  
   // ASSIGNMENT:
   //
   // Compute the forces on each particle, and update the state
@@ -137,8 +139,8 @@ void Cloth::Animate() {
   //
   // Also, this is where you'll put the Provot correction for super-elasticity
   //
-  // *********************************************************************
-
+  // *********************************************************************    
+  
 
   // commented out because an animated bounding box can be weird
   //std::cout<<provot_structural_correction<<std::endl;
@@ -177,7 +179,7 @@ void Cloth::Animate() {
         pij.setPosition(position_ij);
         //do provot structural&shear correction 6 times
       }
-
+      
     }
   }
   for (int k = 0; k < 4; ++k)
@@ -185,9 +187,11 @@ void Cloth::Animate() {
     compute_provot_structural();
     compute_provot_shear();
   }
+  //check_collision();
   ComputeNewVelocities();
   MoveParticles();
   ReassignParticles();
+  check_collision();
   new_p_water_particles();
   if(count_%3==0)
   GenerateFP();
@@ -245,8 +249,8 @@ glm::vec3 Cloth::compute_shear_force(int i, int j)
   {
     total_shear_force += force_between_2_point(i,j,i+1,j-1,1);
   }
-  return total_shear_force;
-}
+  return total_shear_force; 
+}   
 //compute total bend force around ij
 glm::vec3 Cloth::compute_bend_force(int i, int j)
 {
@@ -281,7 +285,7 @@ glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
   glm::vec3 pij;// position of the calculate point
   glm::vec3 pkl;// position of other point
   float l0;// natural lenght of the spring
-  glm::vec3 lv;//vector from pij to pkl
+  glm::vec3 lv;//vector from pij to pkl 
   glm::vec3 v;//normalized l
   p1 = getParticle(i,j);
   p2 = getParticle(k,l);
@@ -307,7 +311,7 @@ glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
     force_ = float(k_bend) * (lv - l0 * v);
   //force_ *= -1;
   return force_;
-}
+} 
 
 void Cloth::compute_provot_structural()
 {
@@ -444,7 +448,7 @@ void Cloth::correct_position_2_particle(ClothParticle& pij,ClothParticle& pkl,in
         pij.setPosition(position_ij + org_l_ij_kl);
       else if (!pkl.isFixed())
         pkl.setPosition(position_kl - org_l_ij_kl);
-    }
+    } 
   }
 }
 
@@ -462,14 +466,17 @@ void Cloth::ComputeNewVelocities() {
        //std::cout<<glm::to_string(particles[k]->getVelocity())<<std::endl;
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
-       glm::vec3 acceleration_ = glm::vec3(0,-0.08,0) + AbsorbtionForce(i,j)/0.2;
+       glm::vec3 acceleration_ = glm::vec3(0,0.8,0) + AbsorbtionForce(i,j)*0.01;
        p_v += dt * acceleration_;
        if (particles.size()<100)
        {
-         f_p->setVelocity(glm::vec3(0,0,0));
+         if(count_%2==0)
+         f_p->setVelocity(glm::vec3(-0.2,0,0));
+         if(count_%2==1)
+         f_p->setVelocity(glm::vec3(0.2,0,0));
        }
        else
-       //p_v*=0.5;
+       //p_v*=0.5; 
        f_p->setVelocity(p_v);
        //std::cout<<glm::to_string(p_v)<<std::endl;
       }
@@ -489,7 +496,7 @@ void Cloth::MoveParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-
+       
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
        glm::vec3 pos = f_p->getPosition();
@@ -511,7 +518,7 @@ void Cloth::ReassignParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-
+       
        FluidParticle *f_p = particles[k];
        glm::vec3 pos = f_p->getPosition();
        int i2 = int(floor(pos.x/dx));
@@ -569,7 +576,7 @@ glm::vec3 Cloth::AbsorbtionForce(int i,int j)
       n_p_d = p_ij.numFluidParticles() - p_01.numFluidParticles();
       total_force += n_p_d*ab_f*dir_/dis_;
     }
-
+    
   }
   if (j>0)
   {
@@ -628,21 +635,11 @@ void Cloth::GenerateFP()
   for (int i = 0; i < 1; ++i)
   {
     FluidParticle *p = new FluidParticle();
-
-    glm::vec3 pos = glm::vec3(args->mtrand()*0.10,
-                              args->mtrand()*0.10,
-                              args->mtrand()*0.2);
-
-    pos = args->mult(pos);
-
-    pos.x += 0.45;
-    pos.y += 1.1;
-    pos.z += 2;
-
-
-
+    glm::vec3 pos = glm::vec3(args->mtrand()*0.05+0.5,
+                                args->mtrand()*0.05+1.2,
+                                args->mtrand()*0.1+1.5);
     p->setPosition(pos);
-    p->setVelocity(glm::vec3(0,0,-4) );
+    p->setVelocity(glm::vec3(0,0,-3.5) );
     water_particles.push_back(p);
 
   }
@@ -660,11 +657,146 @@ void Cloth::new_p_water_particles()
     pos+=vel*dt;
     p->setPosition(pos);
     p->setVelocity(vel);
-    // std::cout<<glm::to_string(pos)<<std::endl;
+    //std::cout<<glm::to_string(pos)<<std::endl;
   }
 }
 
-/*void Cloth::check_collision()
+void Cloth::check_collision()
 {
+  /*ClothParticle & c_p = getParticle(8,12);
+  Cell &cell_ = c_p.getCell();
+  const glm::vec3 &c_p_pos = c_p.getPosition();*/
+  for (int k = 0; k < water_particles.size(); ++k)
+  {
+    FluidParticle *p = water_particles[k];
+    glm::vec3 pos = p->getPosition();
+    if (pos.y<=1&&pos.y>=0.5&&!p->get_Draw())
+    {
+      for (int i = 0; i < nx-1; i++) {
+        for (int j = 0; j < ny-1; j++) {
+          ClothParticle &a = getParticle(i,j);
+          ClothParticle &b = getParticle(i,j+1);
+          ClothParticle &c = getParticle(i+1,j+1);
+          ClothParticle &d = getParticle(i+1,j);
+          const glm::vec3 &a_pos = a.getPosition();
+          const glm::vec3 &b_pos = b.getPosition();
+          const glm::vec3 &c_pos = c.getPosition();
+          const glm::vec3 &d_pos = d.getPosition();
+          glm::vec3 v_a_b = (b_pos - a_pos);
+          glm::vec3 v_a_d = (d_pos - a_pos);
+          glm::vec3 nor_abd = cross(v_a_b,v_a_d);
+          glm::vec3 v_c_b = (b_pos - c_pos);
+          glm::vec3 v_c_d = (d_pos - c_pos);
+          glm::vec3 nor_cdb = cross(v_c_b,v_c_d);
+          float m1 = -(nor_abd.x * a_pos.x +
+                 nor_abd.y * a_pos.y +
+                 nor_abd.z * a_pos.z);
+          float m2 = -(nor_cdb.x * c_pos.x +
+                 nor_cdb.y * c_pos.y +
+                 nor_cdb.z * c_pos.z);
+          //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
+          if (fabs(pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1)<=error_)
+          {
+            //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
+            //p->set_Draw(1);
+            float p_a = length(pos - a_pos);
+            float p_b = length(pos - b_pos);
+            float p_d = length(pos - d_pos);
+           
+            //glm::vec3 p_velocity = p->getVelocity();
+            //nor_abd = normalize(nor_abd);
+            //p_velocity
 
-}*/
+            if (p_a<=p_b&&p_a<=p_d)
+            {
+               Cell &cell = a.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(a_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               //cell.addParticle(f_p);
+               cell.addParticle(f_p);
+               //std::cout<<i<<"  "<<j+1<<std::endl;
+            }
+            else if (p_b<=p_a&&p_b<=p_d)
+            {
+               Cell &cell = b.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(b_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               cell.addParticle(f_p);
+               //cell.addParticle(p);
+               //std::cout<<i<<"  "<<j<<std::endl;
+            }
+            else if (p_d<=p_b&&p_d<=p_a)
+            {
+               Cell &cell = d.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(c_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               cell.addParticle(f_p);
+               //cell.addParticle(p);
+               //std::cout<<i+1<<"   "<<j<<std::endl;
+            }
+          }
+          else if (fabs(pos.x*nor_cdb.x+pos.y*nor_cdb.y+pos.z*nor_cdb.z+m2)<=error_)
+          {
+            //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
+            p->set_Draw(1);
+            float p_c = length(pos - c_pos);
+            float p_b = length(pos - b_pos);
+            float p_d = length(pos - d_pos);
+           
+            if (p_c<=p_b&&p_c<=p_d)
+            {
+               Cell &cell = c.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(c_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               cell.addParticle(f_p);
+               //cell.addParticle(p);
+               //std::cout<<i+1<<"  "<<j+1<<std::endl;
+            }
+            else if (p_b<=p_c&&p_b<=p_d)
+            {
+               Cell &cell = b.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(b_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               cell.addParticle(f_p);
+               //cell.addParticle(p);
+               //std::cout<<i<<"  "<<j+1<<std::endl;
+            }
+            else if (p_d<=p_b&&p_d<=p_c)
+            {
+               Cell &cell = d.getCell();
+               FluidParticle *f_p = new FluidParticle();
+               f_p->setPosition(d_pos);
+               f_p->setVelocity(glm::vec3(0,0,0));
+               cell.addParticle(f_p);
+               //cell.addParticle(p);
+               //std::cout<<i+1<<"  "<<j<<std::endl;
+            }
+          }
+
+
+
+        }
+      }
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

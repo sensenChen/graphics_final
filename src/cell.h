@@ -11,6 +11,8 @@ public:
   // accessor
   const glm::vec3& getPosition() const { return position; }
   const glm::vec3& getVelocity() const { return velocity; }
+  bool get_Draw() {return draw_;}
+  void set_Draw(bool a) {draw_ =a ;}
   // modifer
   void setPosition(const glm::vec3 &p) { position = p; }
   void setVelocity(const glm::vec3 &v) { velocity = v; }
@@ -18,6 +20,7 @@ private:
   // representation
   glm::vec3 position;
   glm::vec3 velocity;
+  bool draw_;
 };
 
 // ==============================================================================

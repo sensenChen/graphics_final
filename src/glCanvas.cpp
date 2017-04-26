@@ -532,7 +532,7 @@ int HandleGLError(const std::string &message, bool ignore) {
   while ((error = glGetError()) != GL_NO_ERROR) {
     if (!ignore) {
       if (message != "") {
-	std::cerr << "[" << message << "] ";
+  std::cerr << "[" << message << "] ";
       }
       std::cerr << "GL ERROR(" << i << ") " << WhichGLError(error) << std::endl;
     }

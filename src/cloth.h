@@ -103,6 +103,7 @@ private:
   glm::vec3 AbsorbtionForce(int i, int j);
   void GenerateFP();
   void new_p_water_particles();
+  void check_collision();
   // REPRESENTATION
   ArgParser *args;
   // grid data structure

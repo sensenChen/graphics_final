@@ -289,9 +289,6 @@ private:
       glm::vec3 b = (*t)[1]->getPos() * float(.4);
       glm::vec3 c = (*t)[2]->getPos() * float(.4);
 
-      a = args->mult(a);
-      b = args->mult(b);
-      c = args->mult(c);
 
       a.x += 8.3;
       b.x += 8.3;
@@ -300,10 +297,11 @@ private:
       a.y += 5.4;
       b.y += 5.4;
       c.y += 5.4;
-
-      a.z += 2;
-      b.z += 2;
-      c.z += 2;
+      
+      a.z += 1.5;
+      b.z += 1.5;
+      c.z += 1.5;
+      
 
       glm::vec3 na = computeNormal(a,b,c);
       glm::vec3 nb = na;

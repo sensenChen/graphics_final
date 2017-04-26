@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <string>
+
 #include "boundingbox.h"
 
 class ArgParser;
@@ -30,8 +31,6 @@ public:
   static ArgParser *args;
   static Cloth* cloth;
   static Fluid* fluid;
-  // static Mesh* mesh;
-
   static BoundingBox bbox;
   static Camera* camera;
   static GLFWwindow* window;
@@ -43,7 +42,7 @@ public:
   static GLuint programID;
   static GLuint colormodeID;
   static GLuint wireframeID;
-
+  
   // mouse position
   static int mouseX;
   static int mouseY;
