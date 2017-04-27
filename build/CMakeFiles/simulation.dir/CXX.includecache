@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 cassert
 -
 string
@@ -14,21 +14,21 @@ string
 glm/glm.hpp
 -
 mtrand.h
-/Users/sensen/Desktop/graphics_final/src/mtrand.h
+/Users/edwardxu/Desktop/graphics_final/src/mtrand.h
 
-/Users/sensen/Desktop/graphics_final/src/boundingbox.cpp
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.cpp
 iostream
 -
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 glm/glm.hpp
 -
 glm/gtc/matrix_transform.hpp
@@ -40,13 +40,13 @@ algorithm
 vector
 -
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 
-/Users/sensen/Desktop/graphics_final/src/camera.cpp
+/Users/edwardxu/Desktop/graphics_final/src/camera.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 camera.h
-/Users/sensen/Desktop/graphics_final/src/camera.h
+/Users/edwardxu/Desktop/graphics_final/src/camera.h
 cmath
 -
 glm/glm.hpp
@@ -58,7 +58,7 @@ glm/gtc/matrix_transform.hpp
 glm/gtx/transform.hpp
 -
 
-/Users/sensen/Desktop/graphics_final/src/camera.h
+/Users/edwardxu/Desktop/graphics_final/src/camera.h
 cassert
 -
 iostream
@@ -70,59 +70,59 @@ glm/glm.hpp
 glm/gtc/matrix_transform.hpp
 -
 
-/Users/sensen/Desktop/graphics_final/src/cell.h
+/Users/edwardxu/Desktop/graphics_final/src/cell.h
 cassert
 -
 vector
 -
 
-/Users/sensen/Desktop/graphics_final/src/cloth.cpp
+/Users/edwardxu/Desktop/graphics_final/src/cloth.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 fstream
 -
 iostream
 -
 glm/ext.hpp
-/Users/sensen/Desktop/graphics_final/src/glm/ext.hpp
+/Users/edwardxu/Desktop/graphics_final/src/glm/ext.hpp
 cloth.h
-/Users/sensen/Desktop/graphics_final/src/cloth.h
+/Users/edwardxu/Desktop/graphics_final/src/cloth.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 math.h
 -
 glm/gtx/string_cast.hpp
-/Users/sensen/Desktop/graphics_final/src/glm/gtx/string_cast.hpp
+/Users/edwardxu/Desktop/graphics_final/src/glm/gtx/string_cast.hpp
 fluid.h
-/Users/sensen/Desktop/graphics_final/src/fluid.h
+/Users/edwardxu/Desktop/graphics_final/src/fluid.h
 
-/Users/sensen/Desktop/graphics_final/src/cloth.h
+/Users/edwardxu/Desktop/graphics_final/src/cloth.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 vector
 -
 cell.h
-/Users/sensen/Desktop/graphics_final/src/cell.h
+/Users/edwardxu/Desktop/graphics_final/src/cell.h
 
-/Users/sensen/Desktop/graphics_final/src/cloth_render.cpp
+/Users/edwardxu/Desktop/graphics_final/src/cloth_render.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 fstream
 -
 cloth.h
-/Users/sensen/Desktop/graphics_final/src/cloth.h
+/Users/edwardxu/Desktop/graphics_final/src/cloth.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/edge.h
+/Users/edwardxu/Desktop/graphics_final/src/edge.h
 climits
 -
 cstdio
@@ -132,11 +132,11 @@ cassert
 cstdlib
 -
 vertex.h
-/Users/sensen/Desktop/graphics_final/src/vertex.h
+/Users/edwardxu/Desktop/graphics_final/src/vertex.h
 
-/Users/sensen/Desktop/graphics_final/src/fluid.cpp
+/Users/edwardxu/Desktop/graphics_final/src/fluid.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 fstream
 -
 iomanip
@@ -148,63 +148,63 @@ iostream
 stdlib.h
 -
 fluid.h
-/Users/sensen/Desktop/graphics_final/src/fluid.h
+/Users/edwardxu/Desktop/graphics_final/src/fluid.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 marching_cubes.h
-/Users/sensen/Desktop/graphics_final/src/marching_cubes.h
+/Users/edwardxu/Desktop/graphics_final/src/marching_cubes.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/fluid.h
+/Users/edwardxu/Desktop/graphics_final/src/fluid.h
 cassert
 -
 vector
 -
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 cell.h
-/Users/sensen/Desktop/graphics_final/src/cell.h
+/Users/edwardxu/Desktop/graphics_final/src/cell.h
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 
-/Users/sensen/Desktop/graphics_final/src/fluid_render.cpp
+/Users/edwardxu/Desktop/graphics_final/src/fluid_render.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 fstream
 -
 algorithm
 -
 fluid.h
-/Users/sensen/Desktop/graphics_final/src/fluid.h
+/Users/edwardxu/Desktop/graphics_final/src/fluid.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 marching_cubes.h
-/Users/sensen/Desktop/graphics_final/src/marching_cubes.h
+/Users/edwardxu/Desktop/graphics_final/src/marching_cubes.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/glCanvas.cpp
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 cloth.h
-/Users/sensen/Desktop/graphics_final/src/cloth.h
+/Users/edwardxu/Desktop/graphics_final/src/cloth.h
 fluid.h
-/Users/sensen/Desktop/graphics_final/src/fluid.h
+/Users/edwardxu/Desktop/graphics_final/src/fluid.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 camera.h
-/Users/sensen/Desktop/graphics_final/src/camera.h
+/Users/edwardxu/Desktop/graphics_final/src/camera.h
 mesh.h
-/Users/sensen/Desktop/graphics_final/src/mesh.h
+/Users/edwardxu/Desktop/graphics_final/src/mesh.h
 
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 GL/glew.h
 -
 GLFW/glfw3.h
@@ -222,9 +222,9 @@ cassert
 string
 -
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 
-/Users/sensen/Desktop/graphics_final/src/hash.h
+/Users/edwardxu/Desktop/graphics_final/src/hash.h
 unordered_map
 -
 unordered_map
@@ -234,9 +234,9 @@ unordered_map
 ext/hash_map
 -
 vertex.h
-/Users/sensen/Desktop/graphics_final/src/vertex.h
+/Users/edwardxu/Desktop/graphics_final/src/vertex.h
 
-/Users/sensen/Desktop/graphics_final/src/main.cpp
+/Users/edwardxu/Desktop/graphics_final/src/main.cpp
 GL/glew.h
 -
 GLFW/glfw3.h
@@ -254,81 +254,81 @@ windows.h
 unistd.h
 -
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 camera.h
-/Users/sensen/Desktop/graphics_final/src/camera.h
+/Users/edwardxu/Desktop/graphics_final/src/camera.h
 
-/Users/sensen/Desktop/graphics_final/src/marching_cubes.cpp
+/Users/edwardxu/Desktop/graphics_final/src/marching_cubes.cpp
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 marching_cubes.h
-/Users/sensen/Desktop/graphics_final/src/marching_cubes.h
+/Users/edwardxu/Desktop/graphics_final/src/marching_cubes.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/marching_cubes.h
+/Users/edwardxu/Desktop/graphics_final/src/marching_cubes.h
 vector
 -
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 
-/Users/sensen/Desktop/graphics_final/src/mesh.h
+/Users/edwardxu/Desktop/graphics_final/src/mesh.h
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 vector
 -
 string
 -
 hash.h
-/Users/sensen/Desktop/graphics_final/src/hash.h
+/Users/edwardxu/Desktop/graphics_final/src/hash.h
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 iostream
 -
 edge.h
-/Users/sensen/Desktop/graphics_final/src/edge.h
+/Users/edwardxu/Desktop/graphics_final/src/edge.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 vertex.h
-/Users/sensen/Desktop/graphics_final/src/vertex.h
+/Users/edwardxu/Desktop/graphics_final/src/vertex.h
 triangle.h
-/Users/sensen/Desktop/graphics_final/src/triangle.h
+/Users/edwardxu/Desktop/graphics_final/src/triangle.h
 argparser.h
-/Users/sensen/Desktop/graphics_final/src/argparser.h
+/Users/edwardxu/Desktop/graphics_final/src/argparser.h
 
-/Users/sensen/Desktop/graphics_final/src/mtrand.cpp
+/Users/edwardxu/Desktop/graphics_final/src/mtrand.cpp
 mtrand.h
-/Users/sensen/Desktop/graphics_final/src/mtrand.h
+/Users/edwardxu/Desktop/graphics_final/src/mtrand.h
 
-/Users/sensen/Desktop/graphics_final/src/mtrand.h
+/Users/edwardxu/Desktop/graphics_final/src/mtrand.h
 
-/Users/sensen/Desktop/graphics_final/src/triangle.h
+/Users/edwardxu/Desktop/graphics_final/src/triangle.h
 boundingbox.h
-/Users/sensen/Desktop/graphics_final/src/boundingbox.h
+/Users/edwardxu/Desktop/graphics_final/src/boundingbox.h
 edge.h
-/Users/sensen/Desktop/graphics_final/src/edge.h
+/Users/edwardxu/Desktop/graphics_final/src/edge.h
 
-/Users/sensen/Desktop/graphics_final/src/utils.cpp
+/Users/edwardxu/Desktop/graphics_final/src/utils.cpp
 iostream
 -
 glCanvas.h
-/Users/sensen/Desktop/graphics_final/src/glCanvas.h
+/Users/edwardxu/Desktop/graphics_final/src/glCanvas.h
 utils.h
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 
-/Users/sensen/Desktop/graphics_final/src/utils.h
+/Users/edwardxu/Desktop/graphics_final/src/utils.h
 cassert
 -
 vector
 -
 vbo_structs.h
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 
-/Users/sensen/Desktop/graphics_final/src/vbo_structs.h
+/Users/edwardxu/Desktop/graphics_final/src/vbo_structs.h
 
-/Users/sensen/Desktop/graphics_final/src/vertex.h
+/Users/edwardxu/Desktop/graphics_final/src/vertex.h
 glm/glm.hpp
 -
 
