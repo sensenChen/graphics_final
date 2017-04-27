@@ -12,7 +12,9 @@ public:
   const glm::vec3& getPosition() const { return position; }
   const glm::vec3& getVelocity() const { return velocity; }
   bool get_Draw() {return draw_;}
+  bool get_Leak() {return leak_;}
   void set_Draw(bool a) {draw_ =a ;}
+  void set_Leak(bool a) {leak_=a ;}
   // modifer
   void setPosition(const glm::vec3 &p) { position = p; }
   void setVelocity(const glm::vec3 &v) { velocity = v; }
@@ -21,6 +23,7 @@ private:
   glm::vec3 position;
   glm::vec3 velocity;
   bool draw_;
+  bool leak_;
 };
 
 // ==============================================================================

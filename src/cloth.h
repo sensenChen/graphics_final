@@ -104,6 +104,7 @@ private:
   void GenerateFP();
   void new_p_water_particles();
   void check_collision();
+  void leak_detection();
   // REPRESENTATION
   ArgParser *args;
   // grid data structure
