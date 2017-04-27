@@ -1,4 +1,4 @@
-k_structural 2
+k_structural 1
 k_shear 1
 k_bend 1
 damping 0.05
@@ -15,11 +15,11 @@ p 0 0 1
 
 fabric_weight 0.1
 
-f 5 5     0.25 0 0.25
-f 5 15    0.25 0 0.75
-f 15 5    0.75 0 0.25
-f 15 15   0.75 0 0.75
+f 0 0    0 0 0
+f 0 20   0 0 1
+f 20 0   1 0 0
+f 20 20  1 0 1
 
 
-particles_position 11 11 10000
+particles_position 10 10 10
 
