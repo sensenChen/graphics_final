@@ -21,4 +21,4 @@ f 16 16   1 -0.5 2
 f 0 16   0 -0.5 2
 
 
-particles_position 8 2 10
+particles_position 12 3 1

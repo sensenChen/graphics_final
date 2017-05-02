@@ -13,17 +13,15 @@
 // ================================================================================
 // ================================================================================
 
-float ab_f = 0.00009;
-int count_ = 0;
-double error_ = 0.00001;
+float ab_f = 0.00009; //absorption force factor
+int count_ = 0; //random number 
+double error_ = 0.00001; //allowed eeror for collision detection 
 Cloth::Cloth(ArgParser *_args) {
   args =_args;
-
   // open the file
   std::ifstream istr(std::string(args->path+'/'+args->cloth_file).c_str());
   assert (istr.good());
   std::string token;
-
   // read in the simulation parameters
   istr >> token >> k_structural; assert (token == "k_structural");  // (units == N/m)  (N = kg*m/s^2)
   istr >> token >> k_shear; assert (token == "k_shear");
@@ -89,35 +87,26 @@ Cloth::Cloth(ArgParser *_args) {
   //where to put the particles and the number of particles in that cell 
   int p_x,p_y,p_num;
   istr>>p_x>>p_y>>p_num;
+  //calculate the dimension of one cloth cell 
   dx = (b.x - a.x)/(nx-1);
-  //std::cout<<dx<<std::endl;
-  //istr>>token;   
+  //fetch the specified cell  
   ClothParticle &c_w = getParticle(p_x,p_y);
   Cell &cell = c_w.getCell();
+  //generate water particles in that cell
   for (int k = 0; k < p_num; ++k)
   {
     glm::vec3 pos = glm::vec3(args->mtrand()*dx,
                               args->mtrand()*dx,
                               0);
     pos+=glm::vec3(p_x*dx,p_y*dx,0);
-    //std::cout<<glm::to_string(pos)<<std::endl;
     FluidParticle *f_p = new FluidParticle();
     f_p->setPosition(pos);
     f_p->setVelocity(glm::vec3(0,0,0));
     cell.addParticle(f_p);
   }
-  //ComputeNewVelocities(); 
-  //GenerateFP();
-  //std::cout<<water_particles.size()<<std::endl;     
+     
   computeBoundingBox();
-  for (int i = 0; i < nx; ++i)
-  {
-    for (int j = 0; j < ny; ++j)
-    {
-      ClothParticle &p = getParticle(i,j);
-      std::cout<<glm::to_string(p.getPosition())<<std::endl;
-    }
-  }
+  
 }
 
 // ================================================================================
@@ -151,9 +140,6 @@ void Cloth::Animate() {
   
 
   // commented out because an animated bounding box can be weird
-  //std::cout<<provot_structural_correction<<std::endl;
-  //std::cout<<provot_shear_correction<<std::endl;
-  //computeBoundingBox();
   glm::vec3 total_force;
   glm::vec3 aij;
   glm::vec3 vij;
@@ -169,9 +155,7 @@ void Cloth::Animate() {
       if (!pij.isFixed())
       {
         //calculate total force
-        //std::cout<<glm::to_string(pij.getVelocity())<<std::endl;
         total_force = compute_structural_force(i,j);
-        //std::cout<<glm::to_string(total_force)<<std::endl;
         total_force += compute_shear_force(i,j);
         total_force += compute_bend_force(i,j);
         total_force += -damping * pij.getVelocity();
@@ -195,29 +179,25 @@ void Cloth::Animate() {
     compute_provot_structural();
     compute_provot_shear();
   }
-  //check_collision();
+  //check if water collided with cloth 
   check_collision();
+  //compute the next velocity for water particles  
   ComputeNewVelocities();
+  //compute the next position for water particles
   MoveParticles();
+  //reassign water particles
   ReassignParticles();
-  
+  //compute position for new water particles of water source
   new_p_water_particles();
   if(count_%3==0)
   GenerateFP();
   count_++;
   if(count_%7==0)
+  //check if cells overflow and triger leakage 
   leak_detection();
-  new_p_water_particles();
-  /*std::cout<<(getParticle(0,0).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(0,1).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(0,2).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(1,0).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(1,1).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(1,2).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(2,0).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(2,1).getCell()).numParticles()<<std::endl;
-  std::cout<<(getParticle(2,2).getCell()).numParticles()<<std::endl;*/
+  new_p_water_particles(); 
 }
+
 //calculate total structural force aroung ij
 glm::vec3 Cloth::compute_structural_force(int i, int j)
 {
@@ -289,8 +269,6 @@ glm::vec3 Cloth::compute_bend_force(int i, int j)
 //this function use to calculate the force from kj to ij
 glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
 {
-  //static int o;
-  //o++;
   glm::vec3 force_;
   ClothParticle  p1;
   ClothParticle  p2;
@@ -308,20 +286,13 @@ glm::vec3 Cloth::force_between_2_point(int i, int j,int k, int l, int indicator)
   pij = p1.getPosition();
   pkl = p2.getPosition();
   lv = pkl - pij;
-  //std::cout<<o<<std::endl;
-  //std::cout<<l0<<std::endl;
-  //std::cout<<glm::to_string(v)<<std::endl;
-  //std::cout<<glm::to_string(p2.getOriginalPosition())<<std::endl;
-  //std::cout<<glm::to_string(lv)<<std::endl;
   v = glm::normalize(lv);
-  //std::cout<<glm::to_string(v)<<std::endl;
   if (indicator == 0)
     force_ = float(k_structural) * (lv - l0 * v);
   else if(indicator == 1)
     force_ = float(k_shear) * (lv - l0 * v);
   else if(indicator == 3)
     force_ = float(k_bend) * (lv - l0 * v);
-  //force_ *= -1;
   return force_;
 } 
 
@@ -463,7 +434,7 @@ void Cloth::correct_position_2_particle(ClothParticle& pij,ClothParticle& pkl,in
     } 
   }
 }
-
+//compute the new velocity for water particles in cloth 
 void Cloth::ComputeNewVelocities() {
   double dt = args->timestep;
   for (int i = 0; i < nx; ++i)
@@ -475,11 +446,14 @@ void Cloth::ComputeNewVelocities() {
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-       //std::cout<<glm::to_string(particles[k]->getVelocity())<<std::endl;
+      
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
+       //calculate the accelration of one water particle
        glm::vec3 acceleration_ = glm::vec3(0,-0.8,0) + AbsorbtionForce(i,j)*0.01;
+       //compute new velocity according to acceleration
        p_v += dt * acceleration_;
+       //add additional randomness into the velocity
        if (particles.size()<100)
        {
          if(count_%2==0)
@@ -487,15 +461,13 @@ void Cloth::ComputeNewVelocities() {
          if(count_%2==1)
          f_p->setVelocity(glm::vec3(0.2,0,0));
        }
-       else
-       //p_v*=0.5; 
+       else 
        f_p->setVelocity(p_v);
-       //std::cout<<glm::to_string(p_v)<<std::endl;
       }
     }
   }
 }
-
+//calculate the position for every water particles in the cloth 
 void Cloth::MoveParticles()
 {
   double dt = args->timestep;
@@ -508,7 +480,7 @@ void Cloth::MoveParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-       
+       //calculate new velocity by multiplying spped and time step
        FluidParticle *f_p = particles[k];
        glm::vec3 p_v = f_p->getVelocity();
        glm::vec3 pos = f_p->getPosition();
@@ -518,7 +490,7 @@ void Cloth::MoveParticles()
     }
   }
 }
-
+//move paticles from one cell to another cell
 void Cloth::ReassignParticles()
 {
   for (int i = 0; i < nx; ++i)
@@ -530,20 +502,20 @@ void Cloth::ReassignParticles()
       std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < particles.size(); ++k)
       {
-       
        FluidParticle *f_p = particles[k];
        glm::vec3 pos = f_p->getPosition();
        int i2 = int(floor(pos.x/dx));
        int j2 = int(floor(-pos.y/dx));
+       //check if the water paticle is out of current cell
        if (i != i2 || j != j2)
        {
-         //std::cout<<i<<j<<" "<<i2<<j2<<std::endl;
-         cell.removeParticle(f_p);
+         cell.removeParticle(f_p);//if so remove it
+         //check if the water particle is indside the cloth 
          if (i2>=0 && i2<nx)
          {
            if (j2>=0 && j2<ny)
            {
-             ClothParticle &c_p2 = getParticle(i2,j2);
+             ClothParticle &c_p2 = getParticle(i2,j2);//add it into another cell
              Cell &cell2 = c_p2.getCell();
              cell2.addParticle(f_p);
            }
@@ -553,23 +525,25 @@ void Cloth::ReassignParticles()
     }
   }
 }
-
+//this function is used to calculate the absorption force 
 glm::vec3 Cloth::AbsorbtionForce(int i,int j)
 {
+  //fetch the cloth particle and fetch the cell inside it
   ClothParticle &p_ij = getParticle(i,j);
   glm::vec3 position_ij = p_ij.getPosition();
   glm::vec3 total_force = glm::vec3(0,0,0);
   glm::vec3 dir_;
   float dis_;
   int n_p_d;
+  //calculate absorption force from surrounding cells  
   if (i>0)
   {
     ClothParticle &p_0j = getParticle(i-1,j);
     glm::vec3 position_0j = p_0j.getPosition();
-    dir_= normalize(position_0j - position_ij);
-    dis_ = length(position_0j - position_ij);
+    dir_= normalize(position_0j - position_ij);//calculate the direction of the force 
+    dis_ = length(position_0j - position_ij);//calculate the distance between two cells 
     n_p_d = p_ij.numFluidParticles() - p_0j.numFluidParticles();
-    total_force += n_p_d*ab_f*dir_/dis_;
+    total_force += n_p_d*ab_f*dir_/dis_;//calculate the total force 
     if (j>0)
     {
       ClothParticle &p_00 = getParticle(i-1,j-1);
@@ -635,28 +609,26 @@ glm::vec3 Cloth::AbsorbtionForce(int i,int j)
       total_force += n_p_d*ab_f*dir_/dis_;
     }
   }
-
-
-
   return total_force;
-
 }
 
+//generate water fluid for water source 
 void Cloth::GenerateFP()
 {
   for (int i = 0; i < 3; ++i)
   {
     FluidParticle *p = new FluidParticle();
+    //add some randomness into the position
     glm::vec3 pos = glm::vec3(args->mtrand()*0.05+0.5,
                                 args->mtrand()*0.05+0.6,
                                 args->mtrand()*0.1+1.7);
     p->setPosition(pos);
-    p->setVelocity(glm::vec3(0,0,-3.5) );
+    p->setVelocity(glm::vec3(0,0,-3.5) );//set the initial velocity of the water particles 
     water_particles.push_back(p);
 
   }
 }
-
+//calculate the position for water particles from the water source 
 void Cloth::new_p_water_particles()
 {
   float dt = args->timestep;
@@ -669,28 +641,27 @@ void Cloth::new_p_water_particles()
     pos+=vel*dt;
     p->setPosition(pos);
     p->setVelocity(vel);
-    //std::cout<<glm::to_string(pos)<<std::endl;
   }
 }
-
+//this function calculate the area of the triangle orgnized by three points
 double get_area(glm::vec3 t1,glm::vec3 t2,glm::vec3 t3) {
   return 0.5*glm::length(glm::cross((t2-t1),(t3-t1)));
 }
-
+//this function check if one point is inside a triangle 
 bool insideTri(glm::vec3 pos,glm::vec3 t1,glm::vec3 t2,glm::vec3 t3){
-  double area = get_area(t1,t2,t3);
-
-  double a1 = get_area(t1,pos,t3);
+  double area = get_area(t1,t2,t3);//get the area of the original triangle 
+  double a1 = get_area(t1,pos,t3);//get the area of three small triangle 
   double a2 = get_area(t2,pos,t1);
   double a3 = get_area(t3,pos,t2);
-
-  return fabs(area-(a1+a2+a3))<0.01;
+  return fabs(area-(a1+a2+a3))<0.01;//check if the areas are equal
 }
-
+//this function calculates the bouncing back velocity 
 glm::vec3 bounce_back_v(glm::vec3 normal_, glm::vec3 in_v)
 {
   normal_ = normalize(normal_);
   glm::vec3 out_v= in_v - 2*dot(in_v,normal_)*normal_;
+  //add somr randomness to the bounce direction to
+  //make it more realistic 
   if (count_%4 == 0)
     out_v.z *=-1;
   if (count_%4 == 1)
@@ -702,21 +673,19 @@ glm::vec3 bounce_back_v(glm::vec3 normal_, glm::vec3 in_v)
     }
   out_v.y*=0.4;  
   return out_v;
-
 }
-
+//chekc if a water particle hit the cloth 
 void Cloth::check_collision()
 {
-  /*ClothParticle & c_p = getParticle(8,12);
-  Cell &cell_ = c_p.getCell();
-  const glm::vec3 &c_p_pos = c_p.getPosition();*/
   for (int k = 0; k < water_particles.size(); ++k)
   {
     FluidParticle *p = water_particles[k];
     glm::vec3 pos = p->getPosition();
     glm::vec3 velocity_ = p->getVelocity();
+    //only chekc the water paticles in a certain range 
     if (pos.y<=0&&pos.y>=-1&&!p->get_Draw()&&!p->get_Leak())
     {
+      //get the two planes orgnized by 4 points 
       for (int i = 0; i < nx-1; i++) {
         for (int j = 0; j < ny-1; j++) {
           ClothParticle &a = getParticle(i,j);
@@ -727,6 +696,7 @@ void Cloth::check_collision()
           const glm::vec3 &b_pos = b.getPosition();
           const glm::vec3 &c_pos = c.getPosition();
           const glm::vec3 &d_pos = d.getPosition();
+          //calculate the plane functions for those two planes 
           glm::vec3 v_a_b = (b_pos - a_pos);
           glm::vec3 v_a_d = (d_pos - a_pos);
           glm::vec3 nor_abd = cross(v_a_b,v_a_d);
@@ -739,146 +709,102 @@ void Cloth::check_collision()
           float m2 = -(nor_cdb.x * c_pos.x +
                  nor_cdb.y * c_pos.y +
                  nor_cdb.z * c_pos.z);
-          //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
-          if (
-            fabs(pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1)<=error_)
-            //insideTri(pos,a_pos,b_pos,d_pos))
+          //substitude the position into the plane and check if the equation equals zero
+          if ( fabs(pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1)<=error_)
             {  
-              if (count_%1==0)
-            {//p->setPosition();
-                //p->set_Leak(1);
+              //add bounce back to the simulation
+              if (count_%2==0)
+              {
                 p->setVelocity(bounce_back_v(nor_abd,velocity_));
-                 
-
+              }
+              else
+              {  
+                p->set_Draw(2);
+                float p_a = length(pos - a_pos);
+                float p_b = length(pos - b_pos);
+                float p_d = length(pos - d_pos);
+                //check which cell should absorb this particle
+                if (p_a<=p_b&&p_a<=p_d)
+                {
+                  Cell &cell = a.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
+                }
+                else if (p_b<=p_a&&p_b<=p_d)
+                {
+                  Cell &cell = b.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
+                }
+                else if (p_d<=p_b&&p_d<=p_a)
+                {
+                  Cell &cell = d.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
+                }
+              }
             }
-            else{  
-            //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
-            p->set_Draw(2);
-            float p_a = length(pos - a_pos);
-            float p_b = length(pos - b_pos);
-            float p_d = length(pos - d_pos);
-           
-            //glm::vec3 p_velocity = p->getVelocity();
-            //nor_abd = normalize(nor_abd);
-            //p_velocity
-
-            if (p_a<=p_b&&p_a<=p_d)
+            else if (fabs(pos.x*nor_cdb.x+pos.y*nor_cdb.y+pos.z*nor_cdb.z+m2)<=error_ )
             {
-               Cell &cell = a.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               //cell.addParticle(f_p);
-               cell.addParticle(f_p);
-               //std::cout<<glm::to_string(a_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
-            }
-            else if (p_b<=p_a&&p_b<=p_d)
-            {
-               Cell &cell = b.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               cell.addParticle(f_p);
-               //cell.addParticle(p);
-               //std::cout<<glm::to_string(b_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
-            }
-            else if (p_d<=p_b&&p_d<=p_a)
-            {
-               Cell &cell = d.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               cell.addParticle(f_p);
-               //cell.addParticle(p);
-               //std::cout<<glm::to_string(d_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
-            }
-           }
-          }
-          else if (
-            fabs(pos.x*nor_cdb.x+pos.y*nor_cdb.y+pos.z*nor_cdb.z+m2)<=error_ )
-            //insideTri(pos,a_pos,b_pos,d_pos))
-          {
-            if (count_%2==0)
-            {//p->setPosition();
-                //p->set_Leak(1);
+              if (count_%2==1)
+              {
                 p->setVelocity(bounce_back_v(nor_cdb,velocity_));
-                 
-
-            }
-            else{
-            //std::cout<<pos.x*nor_abd.x+pos.y*nor_abd.y+pos.z*nor_abd.z+m1<<std::endl;
-            p->set_Draw(2);
-            float p_c = length(pos - c_pos);
-            float p_b = length(pos - b_pos);
-            float p_d = length(pos - d_pos);
-           
-            if (p_c<=p_b&&p_c<=p_d)
-            {
-               Cell &cell = c.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               cell.addParticle(f_p);
-               //cell.addParticle(p);
-               //std::cout<<glm::to_string(c_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
-            }
-            else if (p_b<=p_c&&p_b<=p_d)
-            {
-               Cell &cell = b.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               cell.addParticle(f_p);
-               //cell.addParticle(p);
-               //std::cout<<glm::to_string(b_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
-            }
-            else if (p_d<=p_b&&p_d<=p_c)
-            {
-               Cell &cell = d.getCell();
-               FluidParticle *f_p = new FluidParticle();
-               f_p->setPosition(pos);
-               f_p->setVelocity(glm::vec3(0,0,0));
-               cell.addParticle(f_p);
-               //cell.addParticle(p);
-               //std::cout<<glm::to_string(d_pos)<<std::endl;
-               //std::cout<<glm::to_string(pos)<<std::endl;
-               //std::cout<<std::endl;
+              }
+              else
+              {
+                p->set_Draw(2);
+                float p_c = length(pos - c_pos);
+                float p_b = length(pos - b_pos);
+                float p_d = length(pos - d_pos); 
+                if (p_c<=p_b&&p_c<=p_d)
+                {
+                  Cell &cell = c.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
+                }
+                else if (p_b<=p_c&&p_b<=p_d)
+                {
+                  Cell &cell = b.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
+                }
+                else if (p_d<=p_b&&p_d<=p_c)
+                {
+                  Cell &cell = d.getCell();
+                  FluidParticle *f_p = new FluidParticle();
+                  f_p->setPosition(pos);
+                  f_p->setVelocity(glm::vec3(0,0,0));
+                  cell.addParticle(f_p);
             }
           }
         }
-
-
-
         }
       }
     }
   }
-  //ReassignParticles();
-
 }
-
+//this function handles leakage
 void Cloth::leak_detection()
 {
   ClothParticle &a = getParticle(0,0);
   glm::vec3 a_pos = glm::vec3(a.getPosition().x,a.getPosition().y,a.getPosition().z);
   int x =0;
   int y =0;
+  //go through every cell and find the position for the lowest cell
   for (int i = 0; i < nx; i++) {
         for (int j = 0; j < ny; j++) {
-          
           ClothParticle &b = getParticle(i,j);
           const glm::vec3 &b_pos = b.getPosition();
-          //std::cout<<i<<"  "<<j<<" "<<to_string(b_pos)<<std::endl;
           if (b_pos.y<a_pos.y)
           {
             x=i;
@@ -889,20 +815,19 @@ void Cloth::leak_detection()
    }
    ClothParticle &c= getParticle(x,y);
    Cell &cell = c.getCell();
-   
-   std::cout<<x<<"  "<<y<<" "<<cell.numParticles()<<std::endl;
+   //chekc if there are too much water in that cell
    if (cell.numParticles()>150)
    {
     std::vector<FluidParticle*> &particles=cell.getParticles();
       for (int k = 0; k < 1; ++k)
       {
+        //if there are too muc hwater in it 
         FluidParticle *p = particles[k];
         const glm::vec3 m_pos = c.getPosition();
-        cell.removeParticle(p);
+        cell.removeParticle(p);//remove the water particles 
         FluidParticle *f_p = new FluidParticle();
-        //p_pos.y -=0.25; 
-        //p_pos.y -=args->mtrand() * 0.01;
         glm::vec3 p_pos;
+        //set up the position of the new water paticles and add some randomness
         if(count_%4==0)
         p_pos = glm::vec3(m_pos.x+args->mtrand()*0.05,m_pos.y,m_pos.z+args->mtrand()*0.05);
         else if(count_%4==1)
@@ -914,8 +839,8 @@ void Cloth::leak_detection()
         f_p->setPosition(p_pos);
         f_p->setVelocity(glm::vec3(0,0,0));
         f_p->set_Leak(1);
-        water_particles.push_back(f_p);
-        //std::cout<<"aaaaaaa"<<std::endl;
+        water_particles.push_back(f_p);//add the new water paticles in to water source 
+        //so the particles can be visualized 
       }
 
      
